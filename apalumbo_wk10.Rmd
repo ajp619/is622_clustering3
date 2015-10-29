@@ -15,9 +15,6 @@ $$1, 45, 80, 24, 56, 71, 17, 40, 66, 32, 48, 96, 9, 41, 75, 11, 58, 93, 28, 39, 
 The clustering algorithms is *k*-means with $k = 3$. Only the centroid of a cluster, along with its count, is needed to represent a cluster.
 
 ```{r}
-x <- c( 1, 45, 80, 
-       24, 56, 71, 17, 40, 66, 
-       32, 48, 96,  9, 41, 75, 11, 58, 93, 28, 39, 77)
 
 # ######### #
 # Functions #
@@ -29,14 +26,20 @@ source("clustering_library.R")
 # Run #
 # ### #
 
+x <- c( 1, 45, 80, 
+       24, 56, 71, 17, 40, 66, 
+       32, 48, 96,  9, 41, 75, 11, 58, 93, 28, 39, 77)
+
+records <- data.frame(x=x)
+
 p <- 3
 k <- 3
 
 records <- data.frame(x=x)
-buckets <- list()
+buckets <- initBuckets(records, 3, 2)
 
-
-
+v <- initClusters(records, 3)
+v
 ```
 
 
