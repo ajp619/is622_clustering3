@@ -1,0 +1,20 @@
+---
+title: "Clustering with Hadoop and Spark"
+author: "Aaron Palumbo"
+date: "October 30, 2015"
+output: html_document
+---
+
+For our clustering experiments, we will be using the Birch3 dataset from http://cs.joensuu.fi/sipu/datasets/. This is a simple 2-D dataset of 100000 observations and 100 clusters. This simple dataset will allow us to concentrate on the algorithms and give us an easy way to visualize the results. As a baseline, we can use the builtin kmeans.
+
+```{r}
+birch3 <- read.table("birch3.txt")
+km <- kmeans(birch3, 100)
+
+plot(birch3)
+points(km$centers, pch=19, col="red")
+```
+
+We can see from the above plot that there is some room for improvement.
+
+Let's start with Hadoop.

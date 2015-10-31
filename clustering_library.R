@@ -8,18 +8,29 @@
 #   -Cluster Assignment
 #   -Buckets
 
-# ------- #
-#    Data #
-# ------- #
-# Data is stored in data frame records
+# ------- 
+#    Data 
+# ------- 
+# Data is stored in data frame: records
 # rows == record
 # cols == feature
 
-# ------------#
-#    Clusters #
-# ------------#
+# ------------
+#    Clusters 
+# ------------
 # Clusters are stored in a list. Each list item represents
 # a cluster.
+
+# ----------------------
+#    Cluster Assignment 
+# ----------------------
+# Cluster assignments are stored in a list.
+# Each element of the list stores a vector whose length
+# equals the number of rows of the points being clustered.
+# The elements of the list contain pregressive 
+# representations of the clustering assignments over the 
+# course of the clustering.
+
 
 
 # ############ #
@@ -27,6 +38,8 @@
 # ############ #
 
 library(dplyr)
+
+
 
 # ################## #
 # Distance Functions #
@@ -44,10 +57,15 @@ distFun <- function(row1, row2, method="euclidean") {
   f[[method]](row1, row2)
 }
 
+
+
 # ####### #
 # Buckets #
 # ####### #
 
+# ======================================================
+# Given a data stream, partition the stream into buckets
+# ======================================================
 initBuckets <- function(records, ptsPerBucket, growthRate) {
   # records      == data.frame
   # ptsPerBucket == Int
@@ -70,19 +88,28 @@ initBuckets <- function(records, ptsPerBucket, growthRate) {
   return(buckets)
 }
 
+
+
 # ################## #
 # Initialize Cluster #
 # ################## #
 
+# ================================
+# Find initial points of a cluster
+# ================================
 initClusters <- function(records, nClusters, 
                          method="furthest", distType="euclidean") {
-  f <- list(#-----------------------------------------------------
+  f <- list(#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    # ----------------------        
     # Select points randomly
+    # ----------------------        
     random = function(records, k) {
-      sample(1:nrow(records), k)
+      list(sample(1:nrow(records), k))
     },
     
+    # ----------------------------------------
     # Select n points as far apart as possible
+    # ----------------------------------------
     furthest = function(records, k) {
       # All combinatons of record pairs
       recordsPairs = data.frame(t(combn(1:nrow(records), 2)))
@@ -102,24 +129,27 @@ initClusters <- function(records, nClusters,
       assignVec <- rep(0, nrow(records))
       assignVec[as.numeric(recordsPairs[1, c("id1", "id2")])] <- c(1, 2)
       
+      # Find the point with the largest minimum distance to all clusters
       while(max(assignVec) < k) {
         selection <- 
           returnPotentialDf(recordsPairs, assignVec) %>%
             group_by(candidates) %>%
             slice(which.min(dist)) %>%
-            group_by(assigned) %>%
-            slice(which.max(dist)) %>%
             ungroup %>%
-            filter(dist == min(dist))
+            slice(which.max(dist))
         assignVec[selection$candidates] <- max(assignVec) + 1
       }
-      return(assignVec)
+      return(list(assignVec))
     }
-  )#--------------------------------------------------------------
-  clusterAssignment <- list()
+  )#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  # Call the selected function to initialize the cluster
   return(f[[method]](records, nClusters))
 }
 
+# ==================================================
+# Given distances and an assignment vector, return
+# a data frame with cols: candidates, assigned, dist
+# ==================================================
 returnPotentialDf <- function(distByPairs, assignVec) {
   candidates <- which(assignVec == 0)
   assigned   <- which(assignVec != 0)
@@ -137,7 +167,30 @@ returnPotentialDf <- function(distByPairs, assignVec) {
 
 
 
+# ##################### #
+# Clustering Algorithms #
+# ##################### #
 
+# ======================================================
+# Given a seeded cluster, partition the remaining points
+# ======================================================
+
+
+
+# ################## #
+# Cluster Operations #
+# ################## #
+
+# ================================
+# Return the centroid of a cluster
+# ================================
+getCentroid <- function(records, method="euclidean") {
+  f <- list(#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    euclidean = function(records) {
+      return(colSums(records) / nrow(records))
+    }
+  )#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+}
 
 
 
