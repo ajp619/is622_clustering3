@@ -18,3 +18,43 @@ points(km$centers, pch=19, col="red")
 We can see from the above plot that there is some room for improvement.
 
 Let's start with Hadoop.
+
+## Load Data into Spark
+
+```{r}
+# initialte Spark
+sc <- SparkR.init()
+# Create an sql environment - not exactly sure why we need this
+sqlContext <- sparkRSQL.init(sc)
+# get data into spark
+sdf <- createDataFrame(sqlContext, birch3)
+```
+
+## Initialize clusters
+
+One method of doing this would be to find the k points that are furthest from each other. This makes a lot of  sense to me, but I'm not sure how to do this with Spark (or with this many data). Another method would be to initialize the clusters randomly. This we can do:
+
+```{r}
+k <- 100
+seeds <- collect(sample(sdf, FALSE, k / nrow(sdf)))
+```
+
+
+Let's take a look at what we got:
+
+```{r}
+plot(birch3)
+points(seeds, pch=19, col="red")
+```
+
+It's a start, but it doesn't really captue the clusters very well.
+
+Moving on ...
+
+
+
+
+
+
+
+
