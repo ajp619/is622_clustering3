@@ -2,7 +2,7 @@
 title: "Wk 8 Mini Project"
 author: "Aaron Palumbo"
 date: "11/1/2015"
-output: html_document
+output: pdf_document
 ---
 
 ```{r}
